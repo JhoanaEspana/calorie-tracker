@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { ChangeEvent, Dispatch, FormEvent, useState } from 'react'
+import { ChangeEvent, Dispatch, FormEvent, useEffect, useState } from 'react'
 import { categories } from '../data/categories'
 import { Activity } from '../types'
-import { ActivityActions } from '../reducers/activity-reducers'
+import { ActivityActions, ActivityState } from '../reducers/activity-reducers'
 
 type FormProps = {
   dispatch: Dispatch<ActivityActions>
+  state: ActivityState
 }
 
 const initialState: Activity = {
@@ -16,8 +17,17 @@ const initialState: Activity = {
   calories: 0,
 }
 
-export const Form = ({ dispatch }: FormProps) => {
+export const Form = ({ dispatch, state }: FormProps) => {
   const [activity, setActivity] = useState<Activity>(initialState)
+
+  useEffect(() => {
+    if (state.activeId) {
+      const selectedActivity = state.activities.filter(
+        (stateActivity) => stateActivity.id === state.activeId
+      )[0]
+      setActivity(selectedActivity)
+    }
+  }, [state.activeId])
 
   const handleChange = (
     evt: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement>
